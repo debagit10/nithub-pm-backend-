@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const generateToken = require("../config/generateToken");
+const passport = require("passport");
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -57,4 +58,13 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const githubAuth = passport.authenticate("github");
+
+const githubAuthCallback = (req, res) => {
+  passport.authenticate("github", { failureRedirect: "/api/user/login" });
+
+  res.redirect("http://localhost:5173/home");
+  res.send(req.user);
+};
+
+module.exports = { registerUser, loginUser, githubAuth, githubAuthCallback };
