@@ -3,37 +3,36 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const passport = require("passport");
 const session = require("express-session");
+const cors = require("cors");
 const GitHubStrategy = require("passport-github").Strategy;
+const GoogleStrategy = require("passport-google-oauth2").Strategy;
 require("dotenv").config();
 
 const PORT = process.env.PORT;
 
 connectDB();
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/api/user/auth/github/callback",
-    },
-    (githubAuthSuccess = (accessToken, refreshToken, profile, cb) => {
-      // This function will be called after successful authentication
-      return cb(null, profile);
-    })
-  )
-);
+// // passport.use(
+// //   new GoogleStrategy({
+// //     clientID: "",
+// //     clientSecret: "",
+// //     callbackURL: "",
+// //     passReqToCallback: "",
+// //   })
+// // );
 
-// Serialize and Deserialize user
-passport.serializeUser(function (user, cb) {
-  cb(null, user);
-});
+// // Serialize and Deserialize user
+// passport.serializeUser(function (user, cb) {
+//   cb(null, user);
+// });
 
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj);
-});
+// passport.deserializeUser(function (obj, cb) {
+//   cb(null, obj);
+// });
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 

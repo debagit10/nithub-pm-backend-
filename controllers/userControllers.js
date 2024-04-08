@@ -2,6 +2,9 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const generateToken = require("../config/generateToken");
 const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth2").Strategy;
+const GitHubStrategy = require("passport-github").Strategy;
+require("dotenv").config();
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -58,13 +61,56 @@ const loginUser = async (req, res) => {
   }
 };
 
-const githubAuth = passport.authenticate("github");
+passport.use(
+  new GitHubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: "http://localhost:5000/api/user/auth/github/callback",
+    },
+    function (accessToken, refreshToken, profile, cb) {
+      // This function will be called after successful authentication
+      console.log(profile);
+      return cb(null, profile);
+    }
+  )
+);
 
-const githubAuthCallback = (req, res) => {
-  passport.authenticate("github", { failureRedirect: "/api/user/login" });
+const githubAuth = passport.authenticate("github", { scope: ["user:email"] });
 
-  res.redirect("http://localhost:5173/home");
-  res.send(req.user);
+const githubAuthCallback = passport.authenticate("github", {
+  failureRedirect: "http://localhost:5173",
+  successRedirect: "http://localhost:5173/home",
+});
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      passReqToCallback: true,
+      callbackURL: "http://localhost:5000/api/user/auth/google/callback",
+    },
+    function (request, accessToken, refreshToken, profile, done) {
+      console.log(profile._json, accessToken);
+    }
+  )
+);
+
+const googleAuth = passport.authenticate("google", {
+  scope: ["email", "profile"],
+});
+
+const googleAuthCallback = passport.authenticate("google", {
+  successRedirect: "http://localhost:5173/home",
+  failureRedirect: "http://localhost:5173",
+});
+
+module.exports = {
+  registerUser,
+  loginUser,
+  googleAuth,
+  googleAuthCallback,
+  githubAuth,
+  githubAuthCallback,
 };
-
-module.exports = { registerUser, loginUser, githubAuth, githubAuthCallback };
