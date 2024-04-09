@@ -22,19 +22,23 @@ connectDB();
 // // );
 
 // // Serialize and Deserialize user
-// passport.serializeUser(function (user, cb) {
-//   cb(null, user);
-// });
-
-// passport.deserializeUser(function (obj, cb) {
-//   cb(null, obj);
-// });
 
 const app = express();
 
 app.use(cors());
 
 app.use(express.json());
+
+app.use(
+  session({
+    secret: "asecret",
+    resave: "false",
+    saveUninitialized: "false",
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/api/user", userRoutes);
 

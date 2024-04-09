@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const generateToken = require("../config/generateToken");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
-const GitHubStrategy = require("passport-github").Strategy;
+
 require("dotenv").config();
 
 const registerUser = async (req, res) => {
@@ -61,26 +61,12 @@ const loginUser = async (req, res) => {
   }
 };
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/api/user/auth/github/callback",
-    },
-    function (accessToken, refreshToken, profile, cb) {
-      // This function will be called after successful authentication
-      console.log(profile);
-      return cb(null, profile);
-    }
-  )
-);
+passport.serializeUser(function (user, cb) {
+  cb(null, user);
+});
 
-const githubAuth = passport.authenticate("github", { scope: ["user:email"] });
-
-const githubAuthCallback = passport.authenticate("github", {
-  failureRedirect: "http://localhost:5173",
-  successRedirect: "http://localhost:5173/home",
+passport.deserializeUser(function (obj, cb) {
+  cb(null, obj);
 });
 
 passport.use(
@@ -92,7 +78,30 @@ passport.use(
       callbackURL: "http://localhost:5000/api/user/auth/google/callback",
     },
     function (request, accessToken, refreshToken, profile, done) {
-      console.log(profile._json, accessToken);
+      const userData = {
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        pic: profile.photos[0].value,
+        password: "",
+      };
+
+      User.findOne({ email: profile.emails[0].value })
+        .then((existingUser) => {
+          if (existingUser) {
+            // If the user already exists, return the existing user
+            console.log(existingUser);
+            return done(null, existingUser);
+          } else {
+            // If the user doesn't exist, create a new user in the database
+            return User.create(userData)
+              .then((newUser) => done(null, newUser))
+              .catch((err) => done(err));
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          done(err);
+        });
     }
   )
 );
@@ -102,8 +111,8 @@ const googleAuth = passport.authenticate("google", {
 });
 
 const googleAuthCallback = passport.authenticate("google", {
-  successRedirect: "http://localhost:5173/home",
   failureRedirect: "http://localhost:5173",
+  successRedirect: "http://localhost:5173/home",
 });
 
 module.exports = {
@@ -111,6 +120,4 @@ module.exports = {
   loginUser,
   googleAuth,
   googleAuthCallback,
-  githubAuth,
-  githubAuthCallback,
 };
