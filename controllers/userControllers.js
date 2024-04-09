@@ -90,6 +90,7 @@ passport.use(
           if (existingUser) {
             // If the user already exists, return the existing user
             console.log(existingUser);
+
             return done(null, existingUser);
           } else {
             // If the user doesn't exist, create a new user in the database
