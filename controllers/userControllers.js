@@ -1,3 +1,4 @@
+//const User = require("../models/userModel");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const generateToken = require("../config/generateToken");
@@ -89,9 +90,9 @@ passport.use(
         .then((existingUser) => {
           if (existingUser) {
             // If the user already exists, return the existing user
-            console.log(existingUser);
+            //console.log(existingUser);
 
-            return done(null, existingUser);
+            return done(null);
           } else {
             // If the user doesn't exist, create a new user in the database
             return User.create(userData)
@@ -112,7 +113,7 @@ const googleAuth = passport.authenticate("google", {
 });
 
 const googleAuthCallback = passport.authenticate("google", {
-  failureRedirect: "http://localhost:5173",
+  failureRedirect: "http://localhost:5000/api/user/auth/failure",
   successRedirect: "http://localhost:5173/home",
 });
 

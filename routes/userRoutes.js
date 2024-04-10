@@ -15,4 +15,13 @@ router.get("/login", loginUser);
 router.get("/auth/google", googleAuth);
 router.get("/auth/google/callback", googleAuthCallback);
 
+// router.get("/auth/success", (req, res) => {
+//   const user = req.user;
+//   console.log(user);
+// });
+
+// router.get("/auth/failure", (req, res) => {
+//   console.log("auth failed");
+// });
+
 module.exports = router;
