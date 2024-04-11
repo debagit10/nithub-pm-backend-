@@ -3,13 +3,24 @@ const Meeting = require("../models/meetingModel");
 const Project = require("../models/projectModel");
 const Member = require("../models/memberModel");
 
+const generateRandomCode = (length) => {
+  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let code = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    code += characters[randomIndex];
+  }
+  return code;
+};
+
 const addTeam = async (req, res) => {
-  const { name, admin_id } = req.body;
+  const { name, user_id } = req.body;
+  const randomCode = generateRandomCode(6);
   try {
     const team = await Team.create({
-      name: "a team",
-      admin_id: "1234",
-      code: "fdzbhd",
+      name: name,
+      admin_id: user_id,
+      code: randomCode,
     });
     if (team) {
       res.json({
@@ -24,16 +35,16 @@ const addTeam = async (req, res) => {
 };
 
 const addProject = async (req, res) => {
-  const { title, about, deadline, file, link, status } = req.body;
+  const { team_id, title, about, deadline, file, link, status } = req.body;
   try {
     const project = await Project.create({
-      team_id: "6616c21c3c45ac56fbf4fa50",
-      title: "a project",
-      about: "just a project",
-      deadline: "21/04/24",
-      file: "a file",
-      link: "a link",
-      status: false,
+      team_id: team_id,
+      title: title,
+      about: about,
+      deadline: deadline,
+      file: file,
+      link: link,
+      status: status,
     });
 
     if (project) {
@@ -50,14 +61,24 @@ const addProject = async (req, res) => {
 };
 
 const addMeeting = async (req, res) => {
-  const { title, day, time, status } = req.body;
+  const { team_id, title, day, time, status } = req.body;
+  const meetingExists = await Meeting.findOne({
+    team_id: team_id,
+    day: day,
+    time: time,
+  });
+
+  if (meetingExists) {
+    res.json({ error: "A meeting has been schduled for this time" });
+    return;
+  }
   try {
     const meeting = await Meeting.create({
-      team_id: "6616c21c3c45ac56fbf4fa50",
-      title: "a meeting",
-      day: "21/04/24",
-      time: "9:00am",
-      status: false,
+      team_id: team_id,
+      title: title,
+      day: day,
+      time: time,
+      status: status,
     });
 
     if (meeting) {
@@ -74,27 +95,92 @@ const addMeeting = async (req, res) => {
 };
 
 const addMember = async (req, res) => {
-  const { member_id, role } = req.body;
+  const { user_id, role, username, team_id } = req.body;
+
+  const memberExists = await Member.findOne({
+    member_id: user_id,
+    team_id: team_id,
+  });
+
+  if (memberExists) {
+    res.json({ error: "User already in team" });
+  } else {
+    try {
+      const member = await Member.create({
+        team_id: team_id,
+        member_id: user_id,
+        member_name: username,
+        role: role,
+      });
+
+      if (member) {
+        member.save();
+
+        res.json({
+          success: "member added successfully",
+        });
+      } else {
+        res.json({ error: "failed" });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
+
+const getProject = async (req, res) => {
+  const { team_id } = req.query;
 
   try {
-    const member = await Member.create({
-      team_id: "6616c21c3c45ac56fbf4fa50",
-      member_id: "6614900e5f88bf4d71a29130",
-      role: "head",
+    const projects = await Project.find({
+      team_id: team_id,
     });
-
-    if (member) {
-      member.save();
-
-      res.json({
-        success: "member added successfully",
-      });
+    if (projects) {
+      res.json(projects);
     } else {
-      res.json({ error: "failed" });
+      res.json({ error: "There are currently no projects in this team" });
     }
   } catch (error) {
     console.log(error);
   }
 };
 
-module.exports = { addTeam, addMeeting, addProject, addMember };
+const getMembers = async (req, res) => {
+  const { team_id } = req.query;
+
+  try {
+    const members = await Member.find({ team_id: team_id });
+    if (members) {
+      res.json(members);
+    } else {
+      res.json({ error: "There are currently no members in this team" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getMeeting = async (req, res) => {
+  const { team_id } = req.query;
+
+  try {
+    const meeting = await Meeting.find({ team_id: team_id });
+    if (meeting) {
+      res.json(meeting);
+    } else {
+      res.json({ error: "There are currently no scheduled meeting" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = {
+  addTeam,
+  addMeeting,
+  addProject,
+  addMember,
+  getProject,
+  getMembers,
+  getMeeting,
+};

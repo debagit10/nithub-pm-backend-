@@ -4,6 +4,7 @@ const memberSchema = new mongoose.Schema(
   {
     team_id: { type: String, required: true },
     member_id: { type: String, required: true },
+    member_name: { type: String, required: true },
     role: { type: String, required: true },
   },
   {
