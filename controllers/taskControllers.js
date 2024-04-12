@@ -54,7 +54,7 @@ const assignTask = async (req, res) => {
 };
 
 const getTask = async (req, res) => {
-  const { project_id } = req.body;
+  const { project_id } = req.query;
 
   try {
     const task = await Task.find({ project_id: project_id });

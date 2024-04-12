@@ -8,7 +8,8 @@ const projectSchema = new mongoose.Schema(
     deadline: { type: String, required: true },
     links: { type: Array },
     files: { type: Array },
-    status: { type: Boolean },
+    status: { type: Boolean, default: false },
+    collaborator: { type: Array },
   },
   {
     timestamps: true,

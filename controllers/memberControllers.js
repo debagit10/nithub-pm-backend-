@@ -1,4 +1,5 @@
 const Member = require("../models/memberModel");
+const Team = require("../models/teamModels");
 
 const addMember = async (req, res) => {
   const { user_id, role, username, team_id } = req.body;
@@ -10,27 +11,33 @@ const addMember = async (req, res) => {
 
   if (memberExists) {
     res.json({ error: "User already in team" });
-  } else {
-    try {
-      const member = await Member.create({
-        team_id: team_id,
-        member_id: user_id,
-        member_name: username,
-        role: role,
+    return;
+  }
+
+  try {
+    const member = await Member.create({
+      team_id: team_id,
+      member_id: user_id,
+      member_name: username,
+      role: role,
+    });
+
+    if (member) {
+      member.save();
+
+      res.json({
+        success: "member added successfully",
       });
-
-      if (member) {
-        member.save();
-
-        res.json({
-          success: "member added successfully",
-        });
-      } else {
-        res.json({ error: "failed" });
+      const team = await Team.findOne({ _id: team_id });
+      if (team) {
+        team.members.push(user_id);
+        team.save();
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      res.json({ error: "failed" });
     }
+  } catch (error) {
+    console.log(error);
   }
 };
 

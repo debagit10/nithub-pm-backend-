@@ -1,4 +1,8 @@
 const User = require("../models/userModel");
+const Project = require("../models/projectModel");
+const Task = require("../models/taskModel");
+const Team = require("../models/teamModels");
+
 const bcrypt = require("bcrypt");
 const generateToken = require("../config/generateToken");
 const passport = require("passport");
@@ -116,9 +120,54 @@ const googleAuthCallback = passport.authenticate("google", {
   successRedirect: "http://localhost:5173/home",
 });
 
+const userProjects = async (req, res) => {
+  const { userID } = req.query;
+  try {
+    const projects = await Project.find({ collaborator: userID });
+    if (projects) {
+      res.json(projects);
+    } else {
+      res.json({ error: "You do not have any projects" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const userTasks = async (req, res) => {
+  const { userID } = req.query;
+  try {
+    const tasks = await Task.find({ assignee_id: userID });
+    if (tasks) {
+      res.json(tasks);
+    } else {
+      res.json({ message: "You have no tasks" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const userTeams = async (req, res) => {
+  const { userID } = req.query;
+  try {
+    const teams = await Team.find({ members: userID });
+    if (teams) {
+      res.json(teams);
+    } else {
+      res.json({ message: "You do not belong to any team" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   googleAuth,
   googleAuthCallback,
+  userProjects,
+  userTasks,
+  userTeams,
 };

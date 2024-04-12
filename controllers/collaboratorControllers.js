@@ -1,7 +1,9 @@
 const Collaborator = require("../models/collaboratorModel");
+const Project = require("../models/projectModel");
 
 const addCollaborator = async (req, res) => {
   const { collaborator_id, project_id, role, collaborator_name } = req.body;
+
   try {
     //check if the collaborator already belongs to the project
     const collaboratorExists = await Collaborator.findOne({
@@ -24,6 +26,11 @@ const addCollaborator = async (req, res) => {
     if (collaborator) {
       collaborator.save();
       res.json({ success: "Collaborator added successfully" });
+      const project = await Project.findById(project_id);
+      if (project) {
+        project.collaborator.push(collaborator_id);
+        project.save();
+      }
     } else {
       res.json({ error: "Collaborator failed to add" });
     }
