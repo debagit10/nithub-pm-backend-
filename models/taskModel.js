@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema({
+  project_id: { type: String, required: true },
+  assignee_id: { type: String, required: true },
+  assignee_name: { type: String, required: true },
+  assigner_id: { type: String, required: true },
+  assigner_name: { type: String, required: true },
   about: { type: String, required: true },
   deadline: { type: String, required: true },
   links: { type: Array },
   files: { type: Array },
-  project_id: { type: String, required: true },
-  assignee_id: { type: String, required: true },
+  status: { type: Boolean },
 });
 
 const Task = mongoose.model("Task", taskSchema);
