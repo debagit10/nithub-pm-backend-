@@ -9,6 +9,7 @@ const teamRoutes = require("./routes/teamRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const collaboratorRoutes = require("./routes/collaboratorRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
+const memberRoutes = require("./routes/memberRoutes");
 
 const passport = require("passport");
 const session = require("express-session");
@@ -39,5 +40,6 @@ app.use("/api/team", teamRoutes);
 app.use("/api/project", projectRoutes);
 app.use("/api/collaborator", collaboratorRoutes);
 app.use("/api/meeting", meetingRoutes);
+app.use("/api/member", memberRoutes);
 
 app.listen(PORT, console.log(`Server listening on ${PORT}`));
