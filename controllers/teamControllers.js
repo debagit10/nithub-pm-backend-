@@ -34,32 +34,6 @@ const addTeam = async (req, res) => {
   }
 };
 
-const addProject = async (req, res) => {
-  const { team_id, title, about, deadline, file, link, status } = req.body;
-  try {
-    const project = await Project.create({
-      team_id: team_id,
-      title: title,
-      about: about,
-      deadline: deadline,
-      file: file,
-      link: link,
-      status: status,
-    });
-
-    if (project) {
-      project.save();
-      res.json({
-        success: "project successfully added",
-      });
-    } else {
-      res.json({ error: "failed to add project" });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const addMeeting = async (req, res) => {
   const { team_id, title, day, time, status } = req.body;
   const meetingExists = await Meeting.findOne({
@@ -128,23 +102,6 @@ const addMember = async (req, res) => {
   }
 };
 
-const getProject = async (req, res) => {
-  const { team_id } = req.query;
-
-  try {
-    const projects = await Project.find({
-      team_id: team_id,
-    });
-    if (projects) {
-      res.json(projects);
-    } else {
-      res.json({ error: "There are currently no projects in this team" });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const getMembers = async (req, res) => {
   const { team_id } = req.query;
 
@@ -178,9 +135,7 @@ const getMeeting = async (req, res) => {
 module.exports = {
   addTeam,
   addMeeting,
-  addProject,
   addMember,
-  getProject,
   getMembers,
   getMeeting,
 };
