@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const userRoutes = require("./routes/userRoutes");
 const teamRoutes = require("./routes/teamRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
 const passport = require("passport");
 const session = require("express-session");
@@ -33,5 +34,6 @@ app.use(passport.session());
 
 app.use("/api/user", userRoutes);
 app.use("/api/team", teamRoutes);
+app.use("/api/project", projectRoutes);
 
 app.listen(PORT, console.log(`Server listening on ${PORT}`));
