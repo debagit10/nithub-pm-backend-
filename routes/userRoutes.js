@@ -1,5 +1,6 @@
 const express = require("express");
 const passport = require("passport");
+const { authUser } = require("../config/authUser");
 const {
   registerUser,
   loginUser,
@@ -15,7 +16,7 @@ const router = express.Router();
 router.post("/signup", registerUser);
 router.get("/login", loginUser);
 
-router.get("/project", userProjects);
+router.get("/project", authUser, userProjects);
 router.get("/task", userTasks);
 router.get("/team", userTeams);
 

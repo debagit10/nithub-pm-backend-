@@ -1,7 +1,8 @@
 const Meeting = require("../models/meetingModel");
 
 const addMeeting = async (req, res) => {
-  const { team_id, title, day, time, status } = req.body;
+  const { title, day, time, link } = req.body;
+  const { team_id } = req.query;
 
   const meetingExists = await Meeting.findOne({
     team_id: team_id,
@@ -20,13 +21,13 @@ const addMeeting = async (req, res) => {
       title: title,
       day: day,
       time: time,
-      status: status,
+      link: link,
     });
 
     if (meeting) {
       meeting.save();
       res.json({
-        success: "meeting schedlued successfully",
+        success: "meeting scheduled successfully",
       });
     } else {
       res.json({ error: "failed to schedule meeting" });

@@ -6,7 +6,8 @@ const meetingSchema = new mongoose.Schema(
     title: { type: String, required: true },
     day: { type: String, required: true },
     time: { type: String, required: true },
-    status: { type: Boolean },
+    status: { type: Boolean, default: false },
+    link: { type: String, required: false },
   },
   {
     timestamps: true,

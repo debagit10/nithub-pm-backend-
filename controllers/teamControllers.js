@@ -11,12 +11,13 @@ const generateRandomCode = (length) => {
 };
 
 const addTeam = async (req, res) => {
-  const { name, user_id } = req.body;
+  const { name, user_id, username } = req.body;
   const randomCode = generateRandomCode(6);
   try {
     const team = await Team.create({
       name: name,
       admin_id: user_id,
+      admin_name: username,
       code: randomCode,
     });
     if (team) {

@@ -1,11 +1,19 @@
 const Member = require("../models/memberModel");
 const Team = require("../models/teamModels");
+const User = require("../models/userModel");
 
 const addMember = async (req, res) => {
-  const { user_id, role, username, team_id } = req.body;
+  const { userEmail } = req.body;
+  const { team_id } = req.query;
+
+  const userExists = await User.findOne({ email: userEmail });
+  if (!userExists) {
+    res.json({ error: "User does not exist" });
+    return;
+  }
 
   const memberExists = await Member.findOne({
-    member_id: user_id,
+    member_email: userEmail,
     team_id: team_id,
   });
 
@@ -15,11 +23,18 @@ const addMember = async (req, res) => {
   }
 
   try {
+    //get the user details from the database using email
+    const user = await User.findOne({ email: userEmail });
+    const userID = user._id;
+    const userName = user.name;
+    const userPic = user.pic;
+
     const member = await Member.create({
       team_id: team_id,
-      member_id: user_id,
-      member_name: username,
-      role: role,
+      member_id: userID,
+      member_name: userName,
+      member_email: userEmail,
+      member_pic: userPic,
     });
 
     if (member) {
@@ -30,7 +45,7 @@ const addMember = async (req, res) => {
       });
       const team = await Team.findOne({ _id: team_id });
       if (team) {
-        team.members.push(user_id);
+        team.members.push(userID);
         team.save();
       }
     } else {

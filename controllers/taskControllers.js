@@ -2,7 +2,6 @@ const Task = require("../models/taskModel");
 
 const assignTask = async (req, res) => {
   const {
-    project_id,
     itemID,
     item_name,
     userID,
@@ -13,6 +12,7 @@ const assignTask = async (req, res) => {
     status,
     about,
   } = req.body;
+  const { project_id } = req.params.project_id;
   //check if user is already working on a task
   const taskExists = await Task.findOne({
     assignee_id: itemID,

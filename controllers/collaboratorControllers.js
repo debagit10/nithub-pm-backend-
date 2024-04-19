@@ -1,10 +1,16 @@
 const Collaborator = require("../models/collaboratorModel");
 const Project = require("../models/projectModel");
+const User = require("../models/userModel");
 
 const addCollaborator = async (req, res) => {
-  const { collaborator_id, project_id, role, collaborator_name } = req.body;
+  const { role, collaborator_email } = req.body;
+  const { project_id } = req.query;
 
   try {
+    //get the user details from the database using the email
+    const user = await User.findOne({ email: collaborator_email });
+    const collaborator_id = user._id;
+    const collaborator_name = user.name;
     //check if the collaborator already belongs to the project
     const collaboratorExists = await Collaborator.findOne({
       project_id: project_id,

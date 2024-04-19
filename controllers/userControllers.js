@@ -2,11 +2,11 @@ const User = require("../models/userModel");
 const Project = require("../models/projectModel");
 const Task = require("../models/taskModel");
 const Team = require("../models/teamModels");
-
 const bcrypt = require("bcrypt");
 const generateToken = require("../config/generateToken");
 const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth2").Strategy;
+const session = require("express-session");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 require("dotenv").config();
 
@@ -18,7 +18,7 @@ const registerUser = async (req, res) => {
   const userExists = await User.findOne({ email: email });
 
   if (userExists) {
-    res.status(400).json({ error: "User already exists" });
+    res.json({ error: "User already exists" });
   } else {
     const user = await User.create({
       name: name,
@@ -27,6 +27,7 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
+      req.session.id = user._id;
       res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -51,27 +52,24 @@ const loginUser = async (req, res) => {
   } else {
     const success = await bcrypt.compare(password, user.password);
     if (success) {
+      req.session.id = user._id;
+      console.log(req.session.id);
+
       res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        pic: user.pic,
-        token: generateToken(user._id, user.email),
+        message: "Login successful",
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          pic: user.pic,
+          token: generateToken(user._id, user.email),
+        },
       });
     } else {
       res.status(400).json({ error: "Incorrect password" });
     }
   }
 };
-
-passport.serializeUser(function (user, cb) {
-  cb(null, user);
-});
-
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj);
-});
 
 passport.use(
   new GoogleStrategy(
@@ -81,32 +79,33 @@ passport.use(
       passReqToCallback: true,
       callbackURL: "http://localhost:5000/api/user/auth/google/callback",
     },
-    function (request, accessToken, refreshToken, profile, done) {
-      const userData = {
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        pic: profile.photos[0].value,
-        password: "",
-      };
+    function (accessToken, refreshToken, profile, done) {
+      // const userData = {
+      //   name: profile.displayName,
+      //   email: profile.emails[0].value,
+      //   pic: profile.photos[0].value,
+      //   password: "",
+      // };
 
-      User.findOne({ email: profile.emails[0].value })
-        .then((existingUser) => {
-          if (existingUser) {
-            // If the user already exists, return the existing user
-            //console.log(existingUser);
+      // User.findOne({ email: profile.emails[0].value })
+      //   .then((existingUser) => {
+      //     if (existingUser) {
+      //       // If the user already exists, return the existing user
+      //       //console.log(existingUser);
 
-            return done(null);
-          } else {
-            // If the user doesn't exist, create a new user in the database
-            return User.create(userData)
-              .then((newUser) => done(null, newUser))
-              .catch((err) => done(err));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          done(err);
-        });
+      //       return done(null);
+      //     } else {
+      //       // If the user doesn't exist, create a new user in the database
+      //       return User.create(userData)
+      //         .then((newUser) => done(null, newUser))
+      //         .catch((err) => done(err));
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //     done(err);
+      //   });
+      console.log(accessToken);
     }
   )
 );
@@ -151,7 +150,9 @@ const userTasks = async (req, res) => {
 const userTeams = async (req, res) => {
   const { userID } = req.query;
   try {
-    const teams = await Team.find({ members: userID });
+    const teams = await Team.find({
+      $or: [({ members: userID }, { admin_id: userID })],
+    });
     if (teams) {
       res.json(teams);
     } else {
