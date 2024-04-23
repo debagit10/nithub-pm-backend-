@@ -3,8 +3,8 @@ const Project = require("../models/projectModel");
 const User = require("../models/userModel");
 
 const addCollaborator = async (req, res) => {
-  const { role, collaborator_email } = req.body;
-  const { project_id } = req.query;
+  const { collaborator_email, project_id } = req.body;
+  //const { project_id } = req.query;
 
   try {
     //get the user details from the database using the email
@@ -26,7 +26,6 @@ const addCollaborator = async (req, res) => {
       collaborator_id: collaborator_id,
       collaborator_name: collaborator_name,
       project_id: project_id,
-      role: role,
     });
 
     if (collaborator) {

@@ -5,7 +5,7 @@ const {
   getCollaborator,
 } = require("../controllers/collaboratorControllers");
 
-router.post("/add/:project_id", addCollaborator);
+router.post("/add", addCollaborator);
 router.get("/get", getCollaborator);
 
 module.exports = router;
