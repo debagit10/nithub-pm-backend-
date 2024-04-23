@@ -1,7 +1,9 @@
 const Project = require("../models/projectModel");
+const Collaborator = require("../models/collaboratorModel");
 
 const addProject = async (req, res) => {
-  const { title, about, deadline, file, link, status } = req.body;
+  const { title, about, deadline, file, link, status, user_id, user_name } =
+    req.body;
   const { team_id } = req.query;
   try {
     const project = await Project.create({
@@ -13,7 +15,17 @@ const addProject = async (req, res) => {
       files: file,
       status: status,
     });
+
     if (project) {
+      const collaborator = await Collaborator.create({
+        collaborator_id: user_id,
+        collaborator_name: user_name,
+        project_id: project._id,
+      });
+      if (collaborator) {
+        project.collaborator.push(user_id);
+        collaborator.save();
+      }
       project.save();
       res.json({ success: "Project added to team" });
     } else {
