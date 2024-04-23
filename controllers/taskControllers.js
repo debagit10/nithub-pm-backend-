@@ -12,7 +12,7 @@ const assignTask = async (req, res) => {
     status,
     about,
   } = req.body;
-  const { project_id } = req.params.project_id;
+  const { project_id } = req.query;
   //check if user is already working on a task
   const taskExists = await Task.findOne({
     assignee_id: itemID,
@@ -40,7 +40,6 @@ const assignTask = async (req, res) => {
       deadline: deadline,
       links: links,
       files: files,
-      status: status,
       about: about,
     });
     if (task) {

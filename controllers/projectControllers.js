@@ -21,6 +21,7 @@ const addProject = async (req, res) => {
         collaborator_id: user_id,
         collaborator_name: user_name,
         project_id: project._id,
+        role: "Admin",
       });
       if (collaborator) {
         project.collaborator.push(user_id);
@@ -53,4 +54,16 @@ const getProject = async (req, res) => {
   }
 };
 
-module.exports = { addProject, getProject };
+const projectDetail = async (req, res) => {
+  const { project_id } = req.query;
+  try {
+    const project = await Project.findById(project_id);
+    if (project) {
+      res.json(project);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { addProject, getProject, projectDetail };
