@@ -1,4 +1,6 @@
 const Task = require("../models/taskModel");
+const Mail = require("../models/mailModel");
+const Project = require("../models/projectModel");
 
 const assignTask = async (req, res) => {
   const {
@@ -29,6 +31,8 @@ const assignTask = async (req, res) => {
     return;
   }
 
+  const project = await Project.findById(project_id);
+
   //assign a task if the user has no task at hand for that deadline
   try {
     const task = await Task.create({
@@ -44,6 +48,14 @@ const assignTask = async (req, res) => {
     });
     if (task) {
       res.json({ success: "Task assigned successfully" });
+      const mail = await Mail.create({
+        userID: itemID,
+        title: "New task",
+        message: `You have been assigned a new task on project: ${project.title}. Check task here: "http://localhost:5173/task/${task._id}"`,
+      });
+      if (mail) {
+        mail.save();
+      }
     } else {
       res.json({ error: "Failed to assign task" });
     }
