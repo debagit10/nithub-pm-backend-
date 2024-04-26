@@ -1,5 +1,6 @@
 const Project = require("../models/projectModel");
 const Collaborator = require("../models/collaboratorModel");
+const Mail = require("../models/mailModel");
 
 const addProject = async (req, res) => {
   const { title, about, deadline, file, link, status, user_id, user_name } =
@@ -29,6 +30,14 @@ const addProject = async (req, res) => {
       }
       project.save();
       res.json({ success: "Project added to team" });
+      const mail = await Mail.create({
+        userID: user_id,
+        title: "Created new project",
+        message: `You have successfully created a new project: ${title}. Check project here: "http://localhost:5173/project/${project._id}"`,
+      });
+      if (mail) {
+        mail.save();
+      }
     } else {
       res.json({ error: "Failed to add project" });
     }
