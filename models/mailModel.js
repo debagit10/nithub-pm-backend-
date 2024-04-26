@@ -5,6 +5,7 @@ const mailSchema = new mongoose.Schema(
     userID: { type: String, required: true },
     title: { type: String, required: true },
     message: { type: String, required: true },
+    status: { type: Boolean, default: false },
   },
   {
     timestamps: true,
