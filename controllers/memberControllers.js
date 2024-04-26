@@ -1,6 +1,7 @@
 const Member = require("../models/memberModel");
 const Team = require("../models/teamModels");
 const User = require("../models/userModel");
+const Mail = require("../models/mailModel");
 
 const addMember = async (req, res) => {
   const { userEmail } = req.body;
@@ -43,10 +44,20 @@ const addMember = async (req, res) => {
       res.json({
         success: "member added successfully",
       });
+
       const team = await Team.findOne({ _id: team_id });
       if (team) {
         team.members.push(userID);
         team.save();
+      }
+
+      const mail = await Mail.create({
+        userID: user._id,
+        title: "New member",
+        message: `You have have been added as a member to team: ${team.name}. See team: "http://localhost:5173/team/${team._id}"`,
+      });
+      if (mail) {
+        mail.save();
       }
     } else {
       res.json({ error: "failed" });
