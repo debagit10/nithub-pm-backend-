@@ -1,4 +1,5 @@
 const Team = require("../models/teamModels");
+const Mail = require("../models/mailModel");
 
 const generateRandomCode = (length) => {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -24,6 +25,14 @@ const addTeam = async (req, res) => {
       res.json({
         success: "team created successfully",
       });
+      const mail = await Mail.create({
+        userID: user_id,
+        title: "New team",
+        message: `You have successfully created a new team: ${name}. See team: "http://localhost:5173/team/${team._id}"`,
+      });
+      if (mail) {
+        mail.save();
+      }
     } else {
       res.json({ error: "team creation failed" });
     }
