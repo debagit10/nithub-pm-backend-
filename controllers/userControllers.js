@@ -42,6 +42,15 @@ const registerUser = async (req, res) => {
         pic: user.pic,
         token: generateToken(user._id, user.email),
       });
+
+      const mail = await Mail.create({
+        userID: user._id,
+        title: "Welcome message",
+        message: `Welcome to Nithub Project Management Platform. Feel free to look around to get familiar with the environment and features`,
+      });
+      if (mail) {
+        mail.save();
+      }
     } else {
       res.status(400).json({ error: "Registration failed" });
     }
