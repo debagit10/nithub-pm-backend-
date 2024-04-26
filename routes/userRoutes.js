@@ -9,6 +9,7 @@ const {
   userProjects,
   userTasks,
   userTeams,
+  userMails,
 } = require("../controllers/userControllers");
 
 const router = express.Router();
@@ -19,6 +20,7 @@ router.get("/login", loginUser);
 router.get("/project", userProjects);
 router.get("/task", userTasks);
 router.get("/team", userTeams);
+router.get("/mails", userMails);
 
 router.get("/auth/google", googleAuth);
 router.get("/auth/google/callback", googleAuthCallback);

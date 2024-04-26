@@ -32,6 +32,19 @@ const addTeam = async (req, res) => {
   }
 };
 
+const getTeam = async (req, res) => {
+  const { team_id } = req.query;
+  try {
+    const team = await Team.findById(team_id);
+    if (team) {
+      res.json(team);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   addTeam,
+  getTeam,
 };

@@ -2,10 +2,16 @@ const User = require("../models/userModel");
 const Project = require("../models/projectModel");
 const Task = require("../models/taskModel");
 const Team = require("../models/teamModels");
+const Mail = require("../models/mailModel");
+
 const bcrypt = require("bcrypt");
+
 const generateToken = require("../config/generateToken");
+
 const passport = require("passport");
+
 const session = require("express-session");
+
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 require("dotenv").config();
@@ -163,6 +169,20 @@ const userTeams = async (req, res) => {
   }
 };
 
+const userMails = async (req, res) => {
+  const { userID } = req.query;
+  try {
+    const teams = await Mail.find({ userID: userID });
+    if (teams) {
+      res.json(teams);
+    } else {
+      res.json({ message: "You have no mail" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -171,4 +191,5 @@ module.exports = {
   userProjects,
   userTasks,
   userTeams,
+  userMails,
 };

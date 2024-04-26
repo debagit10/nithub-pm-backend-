@@ -61,7 +61,7 @@ const getTask = async (req, res) => {
       res.json(task);
     } else {
       res.json({
-        message: "There are currently no outstanding task for this project",
+        message: "There are currently no outstanding tasks for this project",
       });
     }
   } catch (error) {
@@ -69,4 +69,23 @@ const getTask = async (req, res) => {
   }
 };
 
-module.exports = { assignTask, getTask };
+const updateTask = async (req, res) => {
+  const { task_id, status } = req.body;
+
+  try {
+    const update = await Task.findByIdAndUpdate(
+      task_id,
+      { status: status },
+      { new: true }
+    );
+    if (update) {
+      res.json({ success: "Task status has been updated" });
+    } else {
+      res.json({ error: "Task status not updated" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { assignTask, getTask, updateTask };
