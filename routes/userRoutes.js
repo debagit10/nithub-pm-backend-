@@ -17,10 +17,10 @@ const router = express.Router();
 router.post("/signup", registerUser);
 router.get("/login", loginUser);
 
-router.get("/project", userProjects);
-router.get("/task", userTasks);
-router.get("/team", userTeams);
-router.get("/mails", userMails);
+router.get("/project", authUser, userProjects);
+router.get("/task", authUser, userTasks);
+router.get("/team", authUser, userTeams);
+router.get("/mails", authUser, userMails);
 
 router.get("/auth/google", googleAuth);
 router.get("/auth/google/callback", googleAuthCallback);

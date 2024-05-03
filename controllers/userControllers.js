@@ -5,6 +5,8 @@ const Team = require("../models/teamModels");
 const Mail = require("../models/mailModel");
 
 const bcrypt = require("bcrypt");
+const CryptoJS = require("crypto-js");
+const jwt = require("jsonwebtoken");
 
 const generateToken = require("../config/generateToken");
 
@@ -33,14 +35,19 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
-      req.session.id = user._id;
+      const token = generateToken(user._id);
+      // const encryptedToken = CryptoJS.AES.encrypt(
+      //   token,
+      //   process.env.CRYPTO_SECRET_KEY
+      // ).toString();
+
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         password: user.password,
         pic: user.pic,
-        token: generateToken(user._id, user.email),
+        token: token,
       });
 
       const mail = await Mail.create({
@@ -67,8 +74,11 @@ const loginUser = async (req, res) => {
   } else {
     const success = await bcrypt.compare(password, user.password);
     if (success) {
-      req.session.id = user._id;
-      console.log(req.session.id);
+      const token = generateToken(user._id);
+      // const encryptedToken = CryptoJS.AES.encrypt(
+      //   token,
+      //   process.env.CRYPTO_SECRET_KEY
+      // ).toString();
 
       res.status(201).json({
         message: "Login successful",
@@ -77,7 +87,7 @@ const loginUser = async (req, res) => {
           name: user.name,
           email: user.email,
           pic: user.pic,
-          token: generateToken(user._id, user.email),
+          token: token,
         },
       });
     } else {
@@ -135,7 +145,14 @@ const googleAuthCallback = passport.authenticate("google", {
 });
 
 const userProjects = async (req, res) => {
-  const { userID } = req.query;
+  const user = req.user;
+  if (user.error) {
+    res.json("Error");
+    return;
+  }
+
+  const userID = user.id;
+
   try {
     const projects = await Project.find({ collaborator: userID });
     if (projects) {
@@ -149,7 +166,14 @@ const userProjects = async (req, res) => {
 };
 
 const userTasks = async (req, res) => {
-  const { userID } = req.query;
+  const user = req.user;
+  if (user.error) {
+    res.json("Error");
+    return;
+  }
+
+  const userID = user.id;
+
   try {
     const tasks = await Task.find({ assignee_id: userID });
     if (tasks) {
@@ -163,7 +187,13 @@ const userTasks = async (req, res) => {
 };
 
 const userTeams = async (req, res) => {
-  const { userID } = req.query;
+  const user = req.user;
+  if (user.error) {
+    res.json("Error");
+    return;
+  }
+  const userID = user.id;
+
   try {
     const teams = await Team.find({
       $or: [({ members: userID }, { admin_id: userID })],
@@ -179,7 +209,13 @@ const userTeams = async (req, res) => {
 };
 
 const userMails = async (req, res) => {
-  const { userID } = req.query;
+  const user = req.user;
+  if (user.error) {
+    res.json("Error");
+    return;
+  }
+
+  const userID = user.id;
   try {
     const teams = await Mail.find({ userID: userID });
     if (teams) {
