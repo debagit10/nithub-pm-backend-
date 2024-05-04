@@ -13,10 +13,6 @@ const memberRoutes = require("./routes/memberRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const mailRoutes = require("./routes/mailRoutes");
 
-const jwt = require("jsonwebtoken");
-const CryptoJS = require("crypto-js");
-const bcrypt = require("bcrypt");
-
 const passport = require("passport");
 const session = require("express-session");
 
