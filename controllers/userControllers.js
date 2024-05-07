@@ -83,7 +83,7 @@ const loginUser = async (req, res) => {
         },
       });
     } else {
-      res.status(400).json({ error: "Incorrect password" });
+      res.json({ error: "Incorrect password" });
     }
   }
 };
