@@ -17,7 +17,7 @@ const sendMail = async (req, res) => {
 };
 
 const deleteMail = async (req, res) => {
-  const { mailID } = req.body;
+  const { mailID } = req.query;
   try {
     const mail = await Mail.findByIdAndDelete(mailID);
     if (mail) {
@@ -33,10 +33,10 @@ const upDateMail = async (req, res) => {
   try {
     const mail = await Mail.findByIdAndUpdate(mailID, { status: status });
     if (mail && status === "true") {
-      res.json({ success: "Email marked as read successfully" });
+      res.json({ success: "Mail marked as read successfully" });
     }
     if (mail && status === "false") {
-      res.json({ success: "Email marked as unread successfully" });
+      res.json({ success: "Mail marked as unread successfully" });
     }
   } catch (error) {
     console.log(error);
