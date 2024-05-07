@@ -36,10 +36,6 @@ const registerUser = async (req, res) => {
 
     if (user) {
       const token = generateToken(user._id);
-      // const encryptedToken = CryptoJS.AES.encrypt(
-      //   token,
-      //   process.env.CRYPTO_SECRET_KEY
-      // ).toString();
 
       res.status(201).json({
         _id: user._id,
@@ -70,15 +66,11 @@ const loginUser = async (req, res) => {
   const user = await User.findOne({ email: email });
 
   if (!user) {
-    res.status(400).json({ error: "User does not exist" });
+    res.json({ error: "User does not exist" });
   } else {
     const success = await bcrypt.compare(password, user.password);
     if (success) {
       const token = generateToken(user._id);
-      // const encryptedToken = CryptoJS.AES.encrypt(
-      //   token,
-      //   process.env.CRYPTO_SECRET_KEY
-      // ).toString();
 
       res.status(201).json({
         message: "Login successful",
