@@ -16,4 +16,31 @@ const sendMail = async (req, res) => {
   }
 };
 
-module.exports = { sendMail };
+const deleteMail = async (req, res) => {
+  const { mailID } = req.body;
+  try {
+    const mail = await Mail.findByIdAndDelete(mailID);
+    if (mail) {
+      res.json({ success: "Mail successfully deleted" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const upDateMail = async (req, res) => {
+  const { mailID, status } = req.body;
+  try {
+    const mail = await Mail.findByIdAndUpdate(mailID, { status: status });
+    if (mail && status === "true") {
+      res.json({ success: "Email marked as read successfully" });
+    }
+    if (mail && status === "false") {
+      res.json({ success: "Email marked as unread successfully" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { sendMail, deleteMail, upDateMail };
