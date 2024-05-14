@@ -16,6 +16,20 @@ const sendMail = async (req, res) => {
   }
 };
 
+const mailDetail = async (req, res) => {
+  const { id } = req.query;
+  try {
+    const mail = await Mail.findById(id);
+    if (mail) {
+      res.json(mail);
+    } else {
+      res.json({ error: "Cannot get mail detail at this time." });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const deleteMail = async (req, res) => {
   const { mailID } = req.query;
   try {
@@ -43,4 +57,4 @@ const upDateMail = async (req, res) => {
   }
 };
 
-module.exports = { sendMail, deleteMail, upDateMail };
+module.exports = { sendMail, deleteMail, upDateMail, mailDetail };
