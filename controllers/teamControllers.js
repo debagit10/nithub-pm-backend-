@@ -1,5 +1,6 @@
 const Team = require("../models/teamModels");
 const Mail = require("../models/mailModel");
+const User = require("../models/userModel");
 
 const generateRandomCode = (length) => {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -12,15 +13,21 @@ const generateRandomCode = (length) => {
 };
 
 const addTeam = async (req, res) => {
-  const { name, user_id, username } = req.body;
+  const user = req.user;
+  const userID = user.id;
+
+  const { name } = req.body;
   const randomCode = generateRandomCode(6);
   try {
+    const user = await User.findById(userID);
+    const username = user.name;
     const team = await Team.create({
       name: name,
-      admin_id: user_id,
+      admin_id: userID,
       admin_name: username,
       code: randomCode,
     });
+
     if (team) {
       res.json({
         success: "team created successfully",
