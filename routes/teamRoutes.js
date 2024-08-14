@@ -3,6 +3,6 @@ const { addTeam, getTeam } = require("../controllers/teamControllers");
 const { authUser } = require("../config/authUser");
 
 router.post("/add", authUser, addTeam);
-router.get("/getDetail", getTeam);
+router.get("/getDetail", authUser, getTeam);
 
 module.exports = router;
