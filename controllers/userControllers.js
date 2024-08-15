@@ -19,7 +19,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 require("dotenv").config();
 
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -32,6 +32,7 @@ const registerUser = async (req, res) => {
       name: name,
       email: email,
       password: hashedPassword,
+      role: role,
     });
 
     if (user) {
