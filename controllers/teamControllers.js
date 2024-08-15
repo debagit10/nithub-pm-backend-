@@ -36,6 +36,9 @@ const addTeam = async (req, res) => {
         success: "team created successfully",
       });
 
+      team.members.push(userID);
+      team.save();
+
       const mail = await Mail.create({
         userID: userID,
         title: "New team",
@@ -60,8 +63,6 @@ const addTeam = async (req, res) => {
 
       const team = await Team.findOne({ _id: team._id });
       if (team) {
-        team.members.push(userID);
-        team.save();
       }
     } else {
       res.json({ error: "team creation failed" });
