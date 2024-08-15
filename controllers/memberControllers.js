@@ -26,16 +26,15 @@ const addMember = async (req, res) => {
   try {
     //get the user details from the database using email
     const user = await User.findOne({ email: userEmail });
-    const userID = user._id;
-    const userName = user.name;
-    const userPic = user.pic;
+    const { _id, name, email, pic, role } = user;
 
     const member = await Member.create({
       team_id: team_id,
-      member_id: userID,
-      member_name: userName,
-      member_email: userEmail,
-      member_pic: userPic,
+      member_id: _id,
+      member_name: name,
+      member_email: email,
+      member_pic: pic,
+      member_role: role,
     });
 
     if (member) {

@@ -7,6 +7,7 @@ const memberSchema = new mongoose.Schema(
     member_name: { type: String, required: true },
     member_id: { type: String, required: true },
     member_pic: { type: String, required: true },
+    member_role: { type: String, required: true },
   },
   {
     timestamps: true,

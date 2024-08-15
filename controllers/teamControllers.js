@@ -1,6 +1,7 @@
 const Team = require("../models/teamModels");
 const Mail = require("../models/mailModel");
 const User = require("../models/userModel");
+const Member = require("../models/memberModel");
 
 const generateRandomCode = (length) => {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -17,14 +18,16 @@ const addTeam = async (req, res) => {
   const userID = user.id;
 
   const { name } = req.body;
+  const teamName = name;
   const randomCode = generateRandomCode(6);
   try {
     const user = await User.findById(userID);
-    const username = user.name;
+    const { _id, name, email, pic, role } = user;
+
     const team = await Team.create({
-      name: name,
+      name: teamName,
       admin_id: userID,
-      admin_name: username,
+      admin_name: user.name,
       code: randomCode,
     });
 
@@ -32,13 +35,27 @@ const addTeam = async (req, res) => {
       res.json({
         success: "team created successfully",
       });
+
       const mail = await Mail.create({
-        userID: user_id,
+        userID: userID,
         title: "New team",
-        message: `You have successfully created a new team: ${name}. See team: "http://localhost:5173/team/${team._id}"`,
+        message: `You have successfully created a new team: ${teamName}. See team: "http://localhost:5173/team/${team._id}"`,
       });
       if (mail) {
         mail.save();
+      }
+
+      const member = await Member.create({
+        team_id: team._id,
+        member_email: email,
+        member_name: name,
+        member_id: _id,
+        member_pic: pic,
+        member_role: role,
+      });
+
+      if (member) {
+        member.save();
       }
     } else {
       res.json({ error: "team creation failed" });
