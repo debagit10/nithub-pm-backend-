@@ -46,7 +46,7 @@ const addMember = async (req, res) => {
 
       const team = await Team.findOne({ _id: team_id });
       if (team) {
-        team.members.push(userID);
+        team.members.push(userExists._id);
         team.save();
       }
 
