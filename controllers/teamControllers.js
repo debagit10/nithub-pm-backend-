@@ -56,11 +56,12 @@ const addTeam = async (req, res) => {
 
       if (member) {
         member.save();
-        const team = await Team.findOne({ _id: team._id });
-        if (team) {
-          team.members.push(userID);
-          team.save();
-        }
+      }
+
+      const team = await Team.findOne({ _id: team._id });
+      if (team) {
+        team.members.push(userID);
+        team.save();
       }
     } else {
       res.json({ error: "team creation failed" });
